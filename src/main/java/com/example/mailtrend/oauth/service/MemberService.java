@@ -25,4 +25,11 @@ public class MemberService {
         Member member = new Member(email, categories);
         memberRepository.save(member);
     }
+
+    public void unsubscribe(String email){
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new CoreException(GlobalErrorType.MEMBER_NOT_FOUND));
+
+        memberRepository.delete(member);
+    }
 }

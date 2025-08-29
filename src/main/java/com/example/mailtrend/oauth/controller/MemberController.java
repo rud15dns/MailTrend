@@ -31,4 +31,13 @@ public class MemberController {
         memberService.subscribe(request.getEmail(), request.getCategories());
         return ResponseEntity.ok(ApiResponse.success());
     }
+
+    @PostMapping("/unsubscribe")
+    public ResponseEntity<ApiResponse<?>> unsubscribe(@RequestBody MemberRequest request){
+        if (request.getEmail() == null)
+            throw new CoreException(GlobalErrorType.INVALID_EMAIL);
+
+        memberService.unsubscribe(request.getEmail());
+        return ResponseEntity.ok(ApiResponse.success());
+    }
 }
