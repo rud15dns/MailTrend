@@ -17,6 +17,10 @@ public enum GlobalErrorType implements ErrorType {
     NOT_ALLOWED(HttpStatus.FORBIDDEN, "권한이 없습니다."),
     CARD_NOT_FOUND(HttpStatus.NOT_FOUND, "카드를 찾을 수 없습니다."),
     MEMBER_DELETION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "회원 정보 삭제에서 오류가 생겼습니다"),
+
+    DUPLICATE_EMAIL(HttpStatus.BAD_REQUEST, "이미 구독중인 이메일입니다."),
+    INVALID_EMAIL(HttpStatus.BAD_REQUEST, "올바른 이메일을 입력해주세요."),
+    INVALID_CATEGORIES(HttpStatus.BAD_REQUEST, "카테고리를 선택해주세요."),
     ;
 
     private final HttpStatus status;
