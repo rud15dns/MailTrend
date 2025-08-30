@@ -32,4 +32,12 @@ public class MemberService {
 
         memberRepository.delete(member);
     }
+
+    public void changeCategory(String email, Set<Category> categories) {
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new CoreException(GlobalErrorType.MEMBER_NOT_FOUND));
+
+        member.updateSelectedCategories(categories);
+        memberRepository.save(member);
+    }
 }

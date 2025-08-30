@@ -25,10 +25,11 @@ public class Member {
 
     public Member(String email, Set<Category> selectedCategories){
         this.email = email;
-        this.selectedCategories = selectedCategories;
+        this.selectedCategories.addAll(selectedCategories);
     }
 
     public void updateSelectedCategories(Set<Category> selectedCategories) {
-        this.selectedCategories = selectedCategories;
+        this.selectedCategories.clear();
+        this.selectedCategories.addAll(selectedCategories);
     }
 }
