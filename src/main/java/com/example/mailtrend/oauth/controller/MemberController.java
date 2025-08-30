@@ -4,10 +4,13 @@ import com.example.mailtrend.common.apiPayload.error.CoreException;
 import com.example.mailtrend.common.apiPayload.error.GlobalErrorType;
 import com.example.mailtrend.common.apiPayload.response.ApiResponse;
 import com.example.mailtrend.oauth.dto.ArchiveRequest;
+import com.example.mailtrend.oauth.dto.ArchiveResponse;
 import com.example.mailtrend.oauth.dto.MemberRequest;
 import com.example.mailtrend.oauth.service.MemberService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -53,6 +56,7 @@ public class MemberController {
         // request.getDate() -> 2025-08
         // request.getCategory() -> [Category.AI, Category.BACKEND]
 
-        return ResponseEntity.ok(ApiResponse.success());
+        List<ArchiveResponse> response = memberService.getArchive(request.getDate(), request.getCategories());
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 }
