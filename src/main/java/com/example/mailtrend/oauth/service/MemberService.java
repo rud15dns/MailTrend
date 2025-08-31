@@ -49,9 +49,16 @@ public class MemberService {
     }
 
     public List<ArchiveResponse> getArchive(YearMonth date, List<Category> categories) {
+        System.out.println("받은 categories: " + categories); // 디버깅 로그
+        System.out.println("categories가 null인가? " + (categories == null));
+        System.out.println("categories가 비어있나? " + (categories != null && categories.isEmpty()));
+
+
         List<MailContent> list = (categories == null || categories.isEmpty())
                 ? mailContentRepository.findAll()
                 : mailContentRepository.findByAiSummary_Source_CategoryIn(categories);
+
+
         return list.stream().map(ArchiveResponse::from).toList();
     }
 }
