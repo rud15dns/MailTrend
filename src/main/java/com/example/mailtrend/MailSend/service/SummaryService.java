@@ -23,14 +23,24 @@ public class SummaryService {
 
     public String summarize(String original, int maxWords) throws IOException {
         String json = """
+    {
+      "model": "%s",
+      "input": [
         {
-          "model": "%s",
-          "input": [
-            {"role":"system","content":[{"type":"text","text":"너는 뛰어난 한국어 요약가다. 핵심만 간결히, 불릿 3~5개로 정리해."}]},
-            {"role":"user","content":[{"type":"text","text":"아래 텍스트를 %d단어 이내로 요약해.\\n---\\n%s"}]}
+          "role": "system",
+          "content": [
+            {"type": "input_text", "text": "너는 뛰어난 한국어 요약가다. 핵심만 간결히, 불릿 3~5개로 정리해."}
+          ]
+        },
+        {
+          "role": "user",
+          "content": [
+            {"type": "input_text", "text": "아래 텍스트를 %d단어 이내로 요약해.\\n---\\n%s"}
           ]
         }
-        """.formatted(model, maxWords, escapeJson(original));
+      ]
+    }
+    """.formatted(model, maxWords, escapeJson(original));
 
         Request req = new Request.Builder()
                 .url(openAiResponsesUrl)
