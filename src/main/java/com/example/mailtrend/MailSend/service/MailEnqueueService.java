@@ -9,15 +9,12 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class MailEnqueueService {
-    private final SqsTemplate sqsTemplate; // spring-cloud-aws 제공
-    @Value("${app.sqs.queue-url}") String queueUrl;
-
+    private final SqsTemplate sqsTemplate;
+    @Value("${app.sqs.mail-queue}")
+    String queueName;
     public void enqueue(MailMessage msg) {
-        // FIFO면 groupId/deduplicationId를 헤더로 세팅
-        sqsTemplate.send(sqsSendOptions -> sqsSendOptions
-                .queue(queueUrl)
-                .messageGroupId(msg.getTo())
-                .messageDeduplicationId(msg.getIdempotencyKey())
+        sqsTemplate.send(opts -> opts
+                .queue(queueName)   // URL 대신 이름!
                 .payload(msg));
     }
 }

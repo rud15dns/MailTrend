@@ -1,22 +1,29 @@
 package com.example.mailtrend.MailSend.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Data
-public class MailMessage {
-    private String version;
-    private String idempotencyKey;
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class MailMessage implements Serializable {
+    @NotBlank
     private String to;
-    private String subject;
-    private String summary;
-    private String original;
-    private Options options;
+    @NotBlank private String subject;
 
-    @Data public static class Options {
-        private String from;
-        private List<String> tags;
-        private Boolean trackOpens;
-    }
+    // SummaryService가 만든 요약
+    private String summary;
+
+    // 원문(필요하면 일부만 저장해도 됨)
+    private String original;
+
+    // FIFO 중복 제거용 키
+    @NotBlank private String idempotencyKey;
 }
