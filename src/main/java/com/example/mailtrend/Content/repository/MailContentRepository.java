@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface MailContentRepository extends JpaRepository<MailContent, Long> {
     List<MailContent> findByAiSummary_Source_CategoryIn(List<Category> categoryList);
+    boolean existsByAiSummaryId(Long aiSummaryId);
 }

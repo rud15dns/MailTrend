@@ -1,11 +1,17 @@
 package com.example.mailtrend.Content.service;
 
 import com.example.mailtrend.Content.entity.AiSummary;
+import com.example.mailtrend.Content.entity.MailContent;
 import com.example.mailtrend.Content.entity.Source;
 import com.example.mailtrend.Content.event.SourceCreatedEvent;
 import com.example.mailtrend.Content.repository.AiSummaryRepository;
+import com.example.mailtrend.Content.repository.MailContentRepository;
 import com.example.mailtrend.Content.repository.SourceRepository;
+import com.example.mailtrend.MailSend.dto.MailMessage;
+import com.example.mailtrend.MailSend.service.MailEnqueueService;
 import com.example.mailtrend.MailSend.service.SummaryService;
+import com.example.mailtrend.oauth.repository.MemberRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -13,6 +19,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
+
+import java.util.List;
 
 
 @Service
@@ -22,13 +30,16 @@ public class SourceSummaryListener {
     private final AiSummaryRepository aiSummaryRepository;
     private final SourceRepository sourceRepository;
     private final SummaryService summaryService;
+    private final MailContentRepository mailContentRepository;
+    private final MemberRepository memberRepository;
+    private final MailEnqueueService mailEnqueueService;
 
     @Value("${summary.max-words:120}")
     private int defaultMaxWords;
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void onSourceCreated(SourceCreatedEvent event) {
+    public void onSourceCreated(SourceCreatedEvent event) throws JsonProcessingException {
         Long sourceId = event.sourceId();
 
         // 1) 이미 요약 있으면 스킵
@@ -51,8 +62,24 @@ public class SourceSummaryListener {
 //        System.out.println("body" + body);
 
         // 4) 저장
-        AiSummary summary = new AiSummary(source, body);
-        aiSummaryRepository.save(summary);
+        AiSummary savedAiSummary = aiSummaryRepository.save(new AiSummary(source, body));
+
+        // 5) MailContent 생성 (중복 방지)
+        if (!mailContentRepository.existsByAiSummaryId(savedAiSummary.getId())) {
+            MailContent savedMailContent =
+                    mailContentRepository.save(new MailContent(savedAiSummary, java.time.LocalDateTime.now()));
+
+            List<String> recipients = memberRepository.findEmailsByCategory(source.getCategory());
+            String subject = "[MailTrend] " + source.getTitle();
+            String original = (source.getLink() == null || source.getLink().isBlank())
+                    ? "(원문 링크가 제공되지 않았습니다)" : "원문 링크: " + source.getLink();
+
+            for (String to : recipients) {
+                String idemp = sourceId + ":" + to; // 멱등 키
+                MailMessage msg = new MailMessage(to, subject, body, original, idemp);
+                mailEnqueueService.enqueue(msg);
+            }
+        }
 
         //
 //        System.out.println("저장됨");

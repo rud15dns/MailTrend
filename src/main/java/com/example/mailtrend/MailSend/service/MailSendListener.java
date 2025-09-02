@@ -1,4 +1,4 @@
-package com.example.mailtrend.MailSend.listener;
+package com.example.mailtrend.MailSend.service;
 
 import com.example.mailtrend.MailSend.dto.MailMessage;
 import com.example.mailtrend.MailSend.service.MailgunService;
