@@ -17,7 +17,7 @@ public class AiSummary {
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "source_id")
+    @JoinColumn(name = "source_id", unique = true)
     private Source source;
 
     @Column(columnDefinition = "TEXT")

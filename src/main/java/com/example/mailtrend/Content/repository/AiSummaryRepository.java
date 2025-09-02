@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AiSummaryRepository extends JpaRepository<AiSummary, Long> {
+    boolean existsBySourceId(Long sourceId);
 }
