@@ -25,7 +25,7 @@ bin/
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
-src/main/resources/application.properties
+src/main/resources/application-prod.properties
 
 ### NetBeans ###
 /nbproject/private/
@@ -37,3 +37,4 @@ src/main/resources/application.properties
 ### VS Code ###
 .vscode/
 .env
+
