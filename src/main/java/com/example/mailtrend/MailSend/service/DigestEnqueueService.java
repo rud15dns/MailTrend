@@ -147,7 +147,7 @@ public class DigestEnqueueService {
                 .toList();
 
         String finalSubject = (subject == null || subject.isBlank())
-                ? "[MailTrend] 오늘의 " + category.name() + " 소식 5 - " + LocalDate.now()
+                ? "[MailTrend] 오늘의 " + category.name() + " 소식 5 - " 
                 : subject;
 
         // 멱등키: 수신자 + 제목 + mailContent id들
