@@ -25,7 +25,8 @@ public interface MailContentRepository extends JpaRepository<MailContent, Long> 
     """)
     Optional<MailContent> findByIdWithSummaryAndSource(@Param("id") Long id);
 
-    List<MailContent> findAllByIdFetchSummaryAndSource(@Param("ids") List<Long> ids);
+    @EntityGraph(attributePaths = {"aiSummary", "aiSummary.source"})
+    List<MailContent> findAllByIdIn(List<Long> ids);
     @EntityGraph(attributePaths = {"aiSummary", "aiSummary.source"})
     List<MailContent> findTop5ByAiSummary_Source_CategoryOrderByIdDesc(Category category);
 }
