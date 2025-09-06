@@ -35,7 +35,7 @@ import java.util.Set;
 @RequestMapping("/api")
 public class MemberController {
     private final MemberService memberService;
-    private final S3Service s3Service;
+
 //    private final SourceRepository sourceRepository;
 //    private final MailContentRepository mailContentRepository;
 //    private final AiSummaryRepository aiSummaryRepository;
@@ -114,13 +114,11 @@ public class MemberController {
             @RequestParam(value = "date", required = false) @DateTimeFormat(pattern = "yyyy-MM") YearMonth date,
             @RequestParam(value = "categories", required = false) List<Category> categories
     ) {
-        return Map.of(
+        Map<String, String> payload = Map.of(
                 "sent_at", "9월 1주차",
                 "content", "https://mailtrend-bucket.s3.ap-northeast-2.amazonaws.com/2025/09/06/1.png"
         );
-
-
-
+        return ResponseEntity.ok(ApiResponse.success(payload)); // ✅ 래퍼에 담아서 반환
     }
     
     // 임시로 DB에 데이터 저장할 때 사용할 함수
