@@ -8,7 +8,7 @@
             display: flex;
             align-items: center;
             background: none;
-            font-family: 'pretended', 'sans-serif';
+            font-family: 'Pretendard', 'sans-serif';
             margin: 0;
             padding: 0;
             position: relative;
@@ -33,14 +33,14 @@
             font-size: 20px;
             font-style: normal;
             font-weight: 700;
-            line-height: 120%; /* 24px */
+            line-height: 120%;
         }
         .main-title {
             color: #111;
             font-size: 32px;
             font-style: normal;
             font-weight: 700;
-            line-height: 120%; /* 38.4px */
+            line-height: 120%;
             margin-top: 16px;
             margin-bottom: 20px;
         }
@@ -49,7 +49,7 @@
             font-size: 14px;
             font-style: normal;
             font-weight: 500;
-            line-height: 120%; /* 16.8px */
+            line-height: 120%;
             display: flex;
             justify-content: flex-end;
             align-items: center;
@@ -67,37 +67,43 @@
             font-size: 16px;
             font-style: normal;
             font-weight: 400;
-            line-height: 160%; /* 25.6px */
+            line-height: 160%;
             border: 1px solid #dfdfdf;
         }
         .section-title {
-            color: #a059e6;
             color: #9112BC;
             font-family: Pretendard;
             font-size: 22px;
             font-style: normal;
             font-weight: 700;
-            line-height: 120%; /* 26.4px */
+            line-height: 120%;
             margin: 40px 0 12px 8px;
         }
         .card-list {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 8px;
+            align-items: stretch;
         }
         .card {
             display: flex;
-            padding: 19px 20px;
+            padding: 19px 20px 50px 20px;
             flex-direction: column;
             align-items: flex-start;
             gap: 10px;
-            align-self: stretch;
+
+            /* 자동 높이 설정 */
+            height: auto;
+            min-height: 120px;
 
             border-radius: 10px;
             border: 1px solid #DFDFDF;
             background: #FFF;
-
             position: relative;
+        }
+        .card-content {
+            flex: 1;
+            width: 100%;
         }
         .card strong {
             color: #111;
@@ -105,7 +111,9 @@
             font-size: 18px;
             font-style: normal;
             font-weight: 700;
-            line-height: 120%; /* 21.6px */
+            line-height: 120%;
+            margin-bottom: 8px;
+            display: block;
         }
         .card ul {
             color: #111;
@@ -113,20 +121,31 @@
             font-size: 16px;
             font-style: normal;
             font-weight: 400;
-            line-height: 160%; /* 25.6px */
+            line-height: 160%;
             margin: 0px;
             padding-left: 20px;
         }
-        .card a {
+        .card p {
+            color: #111;
+            font-family: Pretendard;
+            font-size: 16px;
+            font-style: normal;
+            font-weight: 400;
+            line-height: 160%;
+            margin: 0;
+        }
+        .card-link {
             position: absolute;
             right: 20px;
             bottom: 13px;
+        }
+        .card-link a {
             color: #111;
             font-family: Pretendard;
             font-size: 12px;
             font-style: normal;
             font-weight: 400;
-            line-height: 160%; /* 19.2px */
+            line-height: 160%;
             text-decoration-line: underline;
             text-decoration-style: solid;
             text-decoration-skip-ink: auto;
@@ -134,13 +153,21 @@
             text-underline-offset: auto;
             text-underline-position: from-font;
         }
+        .card-link span {
+            color: #999;
+            font-family: Pretendard;
+            font-size: 12px;
+            font-style: normal;
+            font-weight: 400;
+            line-height: 160%;
+        }
         .mini-section-title {
             color: #9112BC;
             font-family: Pretendard;
             font-size: 22px;
             font-style: normal;
             font-weight: 700;
-            line-height: 120%; /* 26.4px */
+            line-height: 120%;
             margin: 40px 0 12px 8px;
         }
         .word-list {
@@ -167,7 +194,7 @@
             font-size: 16px;
             font-style: normal;
             font-weight: 500;
-            line-height: 160%; /* 25.6px */
+            line-height: 160%;
             position: absolute;
             left: 0;
             top: 0;
@@ -191,7 +218,6 @@
 <body>
 <div class="container">
     <div class="header">
-
         <div class="main-title">월요일 AI 소식이 도착했어요</div>
         <div class="menu-bar">
             <span>이전 기사 보기</span>
@@ -203,85 +229,89 @@
             궁금하지 않나요? 😆 너만 안 보면 나 슬퍼요...
         </div>
     </div>
+
     <div class="section-title">오늘의 트렌드</div>
     <div class="card-list">
         <!-- 카드 0 -->
-        <div class="card"
-             th:with="c=${cards != null and #lists.size(cards) > 0 ? cards[0] : null}">
-            <strong th:text="${c != null and !#strings.isEmpty(c.title) ? c.title : '제목 준비중'}">카드 제목</strong>
-
-            <ul th:if="${c != null and c.bullets != null and !#lists.isEmpty(c.bullets)}">
-                <li th:each="b : ${c.bullets}" th:text="${b}">불릿</li>
-            </ul>
-            <p th:if="${c == null or c.bullets == null or #lists.isEmpty(c.bullets)}"
-               th:text="${c != null and !#strings.isEmpty(c.desc) ? c.desc : '요약 준비중'}">간단 요약</p>
-
-            <a th:if="${c != null and !#strings.isEmpty(c.link)}" th:href="${c.link}" target="_blank">원문 보러 가기</a>
-            <span th:if="${c == null or #strings.isEmpty(c.link)}">링크 준비중</span>
+        <div class="card" th:with="c=${cards != null and #lists.size(cards) > 0 ? cards[0] : null}">
+            <div class="card-content">
+                <strong th:text="${c != null and !#strings.isEmpty(c.title) ? c.title : '제목 준비중'}">카드 제목</strong>
+                <ul th:if="${c != null and c.bullets != null and !#lists.isEmpty(c.bullets)}">
+                    <li th:each="b : ${c.bullets}" th:text="${b}">불릿</li>
+                </ul>
+                <p th:if="${c == null or c.bullets == null or #lists.isEmpty(c.bullets)}"
+                   th:text="${c != null and !#strings.isEmpty(c.desc) ? c.desc : '요약 준비중'}">간단 요약</p>
+            </div>
+            <div class="card-link">
+                <a th:if="${c != null and !#strings.isEmpty(c.link)}" th:href="${c.link}" target="_blank">원문 보러 가기</a>
+                <span th:unless="${c != null and !#strings.isEmpty(c.link)}">링크 준비중</span>
+            </div>
         </div>
 
         <!-- 카드 1 -->
-        <div class="card"
-             th:with="c=${cards != null and #lists.size(cards) > 1 ? cards[1] : null}">
-            <strong th:text="${c != null and !#strings.isEmpty(c.title) ? c.title : '제목 준비중'}">카드 제목</strong>
-
-            <ul th:if="${c != null and c.bullets != null and !#lists.isEmpty(c.bullets)}">
-                <li th:each="b : ${c.bullets}" th:text="${b}">불릿</li>
-            </ul>
-            <p th:if="${c == null or c.bullets == null or #lists.isEmpty(c.bullets)}"
-               th:text="${c != null and !#strings.isEmpty(c.desc) ? c.desc : '요약 준비중'}">간단 요약</p>
-
-            <a th:if="${c != null and !#strings.isEmpty(c.link)}" th:href="${c.link}" target="_blank">원문 보러 가기</a>
-            <span th:if="${c == null or #strings.isEmpty(c.link)}">링크 준비중</span>
+        <div class="card" th:with="c=${cards != null and #lists.size(cards) > 1 ? cards[1] : null}">
+            <div class="card-content">
+                <strong th:text="${c != null and !#strings.isEmpty(c.title) ? c.title : '제목 준비중'}">카드 제목</strong>
+                <ul th:if="${c != null and c.bullets != null and !#lists.isEmpty(c.bullets)}">
+                    <li th:each="b : ${c.bullets}" th:text="${b}">불릿</li>
+                </ul>
+                <p th:if="${c == null or c.bullets == null or #lists.isEmpty(c.bullets)}"
+                   th:text="${c != null and !#strings.isEmpty(c.desc) ? c.desc : '요약 준비중'}">간단 요약</p>
+            </div>
+            <div class="card-link">
+                <a th:if="${c != null and !#strings.isEmpty(c.link)}" th:href="${c.link}" target="_blank">원문 보러 가기</a>
+                <span th:unless="${c != null and !#strings.isEmpty(c.link)}">링크 준비중</span>
+            </div>
         </div>
 
         <!-- 카드 2 -->
-        <div class="card"
-             th:with="c=${cards != null and #lists.size(cards) > 2 ? cards[2] : null}">
-            <strong th:text="${c != null and !#strings.isEmpty(c.title) ? c.title : '제목 준비중'}">카드 제목</strong>
-
-            <ul th:if="${c != null and c.bullets != null and !#lists.isEmpty(c.bullets)}">
-                <li th:each="b : ${c.bullets}" th:text="${b}">불릿</li>
-            </ul>
-            <p th:if="${c == null or c.bullets == null or #lists.isEmpty(c.bullets)}"
-               th:text="${c != null and !#strings.isEmpty(c.desc) ? c.desc : '요약 준비중'}">간단 요약</p>
-
-            <a th:if="${c != null and !#strings.isEmpty(c.link)}" th:href="${c.link}" target="_blank">원문 보러 가기</a>
-            <span th:if="${c == null or #strings.isEmpty(c.link)}">링크 준비중</span>
+        <div class="card" th:with="c=${cards != null and #lists.size(cards) > 2 ? cards[2] : null}">
+            <div class="card-content">
+                <strong th:text="${c != null and !#strings.isEmpty(c.title) ? c.title : '제목 준비중'}">카드 제목</strong>
+                <ul th:if="${c != null and c.bullets != null and !#lists.isEmpty(c.bullets)}">
+                    <li th:each="b : ${c.bullets}" th:text="${b}">불릿</li>
+                </ul>
+                <p th:if="${c == null or c.bullets == null or #lists.isEmpty(c.bullets)}"
+                   th:text="${c != null and !#strings.isEmpty(c.desc) ? c.desc : '요약 준비중'}">간단 요약</p>
+            </div>
+            <div class="card-link">
+                <a th:if="${c != null and !#strings.isEmpty(c.link)}" th:href="${c.link}" target="_blank">원문 보러 가기</a>
+                <span th:unless="${c != null and !#strings.isEmpty(c.link)}">링크 준비중</span>
+            </div>
         </div>
 
         <!-- 카드 3 -->
-        <div class="card"
-             th:with="c=${cards != null and #lists.size(cards) > 3 ? cards[3] : null}">
-            <strong th:text="${c != null and !#strings.isEmpty(c.title) ? c.title : '제목 준비중'}">카드 제목</strong>
-
-            <ul th:if="${c != null and c.bullets != null and !#lists.isEmpty(c.bullets)}">
-                <li th:each="b : ${c.bullets}" th:text="${b}">불릿</li>
-            </ul>
-            <p th:if="${c == null or c.bullets == null or #lists.isEmpty(c.bullets)}"
-               th:text="${c != null and !#strings.isEmpty(c.desc) ? c.desc : '요약 준비중'}">간단 요약</p>
-
-            <a th:if="${c != null and !#strings.isEmpty(c.link)}" th:href="${c.link}" target="_blank">원문 보러 가기</a>
-            <span th:if="${c == null or #strings.isEmpty(c.link)}">링크 준비중</span>
+        <div class="card" th:with="c=${cards != null and #lists.size(cards) > 3 ? cards[3] : null}">
+            <div class="card-content">
+                <strong th:text="${c != null and !#strings.isEmpty(c.title) ? c.title : '제목 준비중'}">카드 제목</strong>
+                <ul th:if="${c != null and c.bullets != null and !#lists.isEmpty(c.bullets)}">
+                    <li th:each="b : ${c.bullets}" th:text="${b}">불릿</li>
+                </ul>
+                <p th:if="${c == null or c.bullets == null or #lists.isEmpty(c.bullets)}"
+                   th:text="${c != null and !#strings.isEmpty(c.desc) ? c.desc : '요약 준비중'}">간단 요약</p>
+            </div>
+            <div class="card-link">
+                <a th:if="${c != null and !#strings.isEmpty(c.link)}" th:href="${c.link}" target="_blank">원문 보러 가기</a>
+                <span th:unless="${c != null and !#strings.isEmpty(c.link)}">링크 준비중</span>
+            </div>
         </div>
 
         <!-- 카드 4 -->
-        <div class="card"
-             th:with="c=${cards != null and #lists.size(cards) > 4 ? cards[4] : null}">
-            <strong th:text="${c != null and !#strings.isEmpty(c.title) ? c.title : '제목 준비중'}">카드 제목</strong>
-
-            <ul th:if="${c != null and c.bullets != null and !#lists.isEmpty(c.bullets)}">
-                <li th:each="b : ${c.bullets}" th:text="${b}">불릿</li>
-            </ul>
-            <p th:if="${c == null or c.bullets == null or #lists.isEmpty(c.bullets)}"
-               th:text="${c != null and !#strings.isEmpty(c.desc) ? c.desc : '요약 준비중'}">간단 요약</p>
-
-            <a th:if="${c != null and !#strings.isEmpty(c.link)}" th:href="${c.link}" target="_blank">원문 보러 가기</a>
-            <span th:if="${c == null or #strings.isEmpty(c.link)}">링크 준비중</span>
+        <div class="card" th:with="c=${cards != null and #lists.size(cards) > 4 ? cards[4] : null}">
+            <div class="card-content">
+                <strong th:text="${c != null and !#strings.isEmpty(c.title) ? c.title : '제목 준비중'}">카드 제목</strong>
+                <ul th:if="${c != null and c.bullets != null and !#lists.isEmpty(c.bullets)}">
+                    <li th:each="b : ${c.bullets}" th:text="${b}">불릿</li>
+                </ul>
+                <p th:if="${c == null or c.bullets == null or #lists.isEmpty(c.bullets)}"
+                   th:text="${c != null and !#strings.isEmpty(c.desc) ? c.desc : '요약 준비중'}">간단 요약</p>
+            </div>
+            <div class="card-link">
+                <a th:if="${c != null and !#strings.isEmpty(c.link)}" th:href="${c.link}" target="_blank">원문 보러 가기</a>
+                <span th:unless="${c != null and !#strings.isEmpty(c.link)}">링크 준비중</span>
+            </div>
         </div>
     </div>
-
-
 
     <div class="footer-svg">
         <svg xmlns="http://www.w3.org/2000/svg" width="600" height="255" viewBox="0 0 600 255" fill="none">
@@ -331,9 +361,7 @@
                 </linearGradient>
             </defs>
         </svg>
-
     </div>
 </div>
-<!-- 삼각형 세 개 SVG 그라데이션 -->
 </body>
 </html>
