@@ -17,20 +17,23 @@ import java.util.Locale;
 @RequiredArgsConstructor
 public class MailTemplateService {
 
-private final SpringTemplateEngine templateEngine;
-    public String renderSummaryEmail(
-            MailMessage msg,
-            List<Source> sources,        // 반드시 5개
-            @Nullable String heroImageUrl,
-            @Nullable String ctaUrl
-    ) {
+
+    private final SpringTemplateEngine templateEngine;
+
+    public String renderSummaryEmail(MailMessage msg) {
         Context ctx = new Context(Locale.KOREA);
+        // 기본 필드
         ctx.setVariable("subject", msg.getSubject());
         ctx.setVariable("summary", msg.getSummary());
-        ctx.setVariable("original", msg.getOriginal());   // 없으면 템플릿에서 자동 미표시
-        ctx.setVariable("sources", sources);
-        ctx.setVariable("heroImageUrl", heroImageUrl);
-        ctx.setVariable("ctaUrl", ctaUrl != null ? ctaUrl : "#");
+        ctx.setVariable("original", msg.getOriginal());
+        ctx.setVariable("heroImageUrl", msg.getHeroImageUrl());
+        ctx.setVariable("ctaUrl", msg.getCtaUrl());
+
+        // 카드 5개
+        ctx.setVariable("cards", msg.getCards());
+
+        // 선택 메타 (없으면 템플릿에서 기본값 사용)
+        // toName/mainTitle/prevUrl/webUrl/introHtml/footerImageUrl/words 등은 필요 시 추가
         return templateEngine.process("mail/summary", ctx);
     }
 }
