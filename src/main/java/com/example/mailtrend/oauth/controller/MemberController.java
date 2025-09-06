@@ -6,6 +6,8 @@ import com.example.mailtrend.Content.entity.Source;
 import com.example.mailtrend.Content.repository.AiSummaryRepository;
 import com.example.mailtrend.Content.repository.MailContentRepository;
 import com.example.mailtrend.Content.repository.SourceRepository;
+import com.example.mailtrend.MailSend.controller.DigestController;
+import com.example.mailtrend.MailSend.service.DigestEnqueueService;
 import com.example.mailtrend.common.apiPayload.error.CoreException;
 import com.example.mailtrend.common.apiPayload.error.GlobalErrorType;
 import com.example.mailtrend.common.apiPayload.response.ApiResponse;
@@ -16,6 +18,7 @@ import com.example.mailtrend.oauth.dto.MemberRequest;
 import com.example.mailtrend.oauth.entity.Category;
 import com.example.mailtrend.oauth.repository.MemberRepository;
 import com.example.mailtrend.oauth.service.MemberService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +27,8 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.Map;
-
+import java.util.Set;
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api")
 public class MemberController {
@@ -39,11 +43,7 @@ public class MemberController {
 //        this.mailContentRepository = mailContentRepository;
 //        this.aiSummaryRepository = aiSummaryRepository;
 //    }
-    public MemberController(MemberService memberService) {
-            this.memberService = memberService;
-    }
-
-
+    private final DigestEnqueueService digestEnqueueService;
     @PostMapping("/subscribe")
     public ResponseEntity<ApiResponse<?>> subscribe(@RequestBody MemberRequest request){
         if (request.getEmail() == null)
@@ -52,7 +52,33 @@ public class MemberController {
         if (request.getCategories() == null || request.getCategories().isEmpty())
             throw new CoreException(GlobalErrorType.INVALID_CATEGORIES);
 
+
+        // 1) 구독 저장
         memberService.subscribe(request.getEmail(), request.getCategories());
+
+        // 2) 해커톤 요구: 사용자가 AI만 선택했다고 가정 → 즉시 다이제스트 발송
+        //    (여러 카테고리 왔어도 AI 포함이면 보내도록 처리)
+        Set<Category> cats = request.getCategories();
+        if (cats.contains(Category.AI)) {
+            // subject/CTA/히어로이미지는 임시 기본값 사용 (원하면 request에 추가해도 됨)
+            String subject = "[MailTrend] 오늘의 AI 소식 5";
+            String ctaUrl = "https://mailtrend.example.com";
+            String hero = null; // 혹은 업로드된 S3 URL
+
+            // 최신 5개 AI 콘텐츠로 즉시 발송 (block)
+            digestEnqueueService.sendLatest5NowTo(
+                    request.getEmail(),
+                    Category.AI,
+                    subject,
+                    hero,
+                    ctaUrl
+            );
+        }
+
+
+
+
+
         return ResponseEntity.ok(ApiResponse.success());
     }
 

@@ -34,6 +34,6 @@ public class MailTemplateService {
 
         // 선택 메타 (없으면 템플릿에서 기본값 사용)
         // toName/mainTitle/prevUrl/webUrl/introHtml/footerImageUrl/words 등은 필요 시 추가
-        return templateEngine.process("mail/summary", ctx);
+        return templateEngine.process("mail/summary-ai", ctx);
     }
 }
