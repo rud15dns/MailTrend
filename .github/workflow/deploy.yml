@@ -1,0 +1,60 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'corretto'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew clean build -x test --no-daemon
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          script: |
+            # 환경변수 설정
+            export MAILGUN_API_KEY="${{ secrets.MAILGUN_API_KEY }}"
+            export OPENAI_API_KEY="${{ secrets.OPENAI_API_KEY }}"
+            export AWS_REGION="${{ secrets.AWS_REGION }}"
+            export AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}"
+            export AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+            export AWS_S3_PREFIX="${{ secrets.AWS_S3_PREFIX }}"
+            export AWS_S3_BUCKET="${{ secrets.AWS_S3_BUCKET }}"
+            
+            # 기존 프로세스 중지
+            pkill -f MailTrend || true
+            
+            # 프로젝트 디렉토리로 이동
+            cd /home/ec2-user/2025_SEASONTHON_TEAM_27_BE
+            
+            # 최신 코드 가져오기
+            git pull origin main
+            
+            # 빌드
+            ./gradlew clean build -x test --no-daemon
+            
+            # 백그라운드에서 애플리케이션 실행
+            nohup java -jar build/libs/MailTrend-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
+            
+            # 배포 완료 확인
+            sleep 5
+            ps aux | grep MailTrend | grep -v grep || echo "Application may not have started properly"
