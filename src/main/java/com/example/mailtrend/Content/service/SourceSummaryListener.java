@@ -13,6 +13,7 @@ import com.example.mailtrend.MailSend.service.SummaryService;
 import com.example.mailtrend.oauth.repository.MemberRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 
 import org.springframework.scheduling.annotation.Async;
@@ -20,10 +21,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
-import java.util.List;
 
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class SourceSummaryListener {
 
@@ -31,8 +32,7 @@ public class SourceSummaryListener {
     private final SourceRepository sourceRepository;
     private final SummaryService summaryService;
     private final MailContentRepository mailContentRepository;
-    private final MemberRepository memberRepository;
-    private final MailEnqueueService mailEnqueueService;
+
 
     @Value("${summary.max-words:120}")
     private int defaultMaxWords;
@@ -49,39 +49,26 @@ public class SourceSummaryListener {
         Source source = sourceRepository.findById(sourceId)
                 .orElseThrow(() -> new IllegalStateException("Source not found: " + sourceId));
 
-//        System.out.println("Source 가져옴");
-        // 3) 요약 실행 (title만)
+        System.out.println("Source 가져옴");
+
+        // 3) 요약 실행 (title말고 description)
         String body;
         try {
-            body = summaryService.summarize(source.getTitle(), defaultMaxWords);
+            body = summaryService.summarize(source.getDescription(), defaultMaxWords);
         } catch (Exception e) {
             // 실패 시
             body = "(요약 생성 실패: " + e.getMessage() + ")";
         }
 
-//        System.out.println("body" + body);
-
         // 4) 저장
         AiSummary savedAiSummary = aiSummaryRepository.save(new AiSummary(source, body));
 
-        // 5) MailContent 생성 (중복 방지)
+        // 5) MailContent 생성 (나중에 불러올 때 한 번에 불러오기 편하도록)
         if (!mailContentRepository.existsByAiSummaryId(savedAiSummary.getId())) {
             MailContent savedMailContent =
                     mailContentRepository.save(new MailContent(savedAiSummary, java.time.LocalDateTime.now()));
 
-            List<String> recipients = memberRepository.findEmailsByCategory(source.getCategory());
-            String subject = "[MailTrend] " + source.getTitle();
-            String original = (source.getLink() == null || source.getLink().isBlank())
-                    ? "(원문 링크가 제공되지 않았습니다)" : "원문 링크: " + source.getLink();
-
-            for (String to : recipients) {
-                String idemp = sourceId + ":" + to; // 멱등 키
-                MailMessage msg = new MailMessage(to, subject, body, original, idemp);
-                mailEnqueueService.enqueue(msg);
-            }
+            log.info("[savedMailContent] 제목 " + savedMailContent.getSource().getTitle() + "\n내용 : " + savedMailContent.getAiSummary().getText());
         }
-
-        //
-//        System.out.println("저장됨");
     }
 }

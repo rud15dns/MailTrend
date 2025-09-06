@@ -25,7 +25,7 @@ public class SourceCreateController {
     public ResponseEntity<ApiResponse<?>> create(@Valid @RequestBody SourceCreateReq req){
         Category category = req.category();
 
-        Source saved = sourceService.create(req.title(), req.link(), category);
+        Source saved = sourceService.create(req.title(), req.description(), req.link(), category);
 
         return ResponseEntity.ok(ApiResponse.success(saved));
     }

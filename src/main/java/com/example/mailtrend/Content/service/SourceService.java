@@ -17,11 +17,11 @@ public class SourceService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
-    public Source create(String title, String link, Category category) {
-        Source saved = sourceRepository.save(new Source(title, link, category));
+    public Source create(String title, String description, String link, Category category) {
+        Source saved = sourceRepository.save(new Source(title, description, link, category));
 
-        // 트랜잭션 안에서 이벤트만 발행
-        eventPublisher.publishEvent(new SourceCreatedEvent(saved.getId(), saved.getTitle()));
+        // 트랜잭션 안에서 Source -> Ai Summary 만 실행
+        eventPublisher.publishEvent(new SourceCreatedEvent(saved.getId(), saved.getTitle(), saved.getDescription()));
         return saved;
     }
 }
