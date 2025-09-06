@@ -25,7 +25,7 @@ public class DigestEnqueueService {
     private final MailContentRepository mailContentRepository;
     private final MemberRepository memberRepository;
     private final MailEnqueueService mailEnqueueService;
-
+    private final S3Service s3Service;
     @Transactional(readOnly = true)
     public int enqueueDigestByCategory(Category category,
                                        String subject,
@@ -169,6 +169,7 @@ log.info("content 생성 잘되려함");
         log.info("동기 발송 직전  ");
         // ✅ 인라인(동기) 발송: 여기서 끝까지 보내고 반환
         Mono<String> sent = mailOrchestrator.sendMessage(msg);
+
         sent.block(); // 해커톤 요구: subscribe 요청 내에서 끝까지 수행
         log.info("동기 발생됨");
     }

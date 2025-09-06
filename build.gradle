@@ -52,6 +52,15 @@ dependencies {
 
 // 메일 보내기 template을 위한 것
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+    implementation 'com.openhtmltopdf:openhtmltopdf-pdfbox:1.0.10'
+    implementation 'com.openhtmltopdf:openhtmltopdf-slf4j:1.0.10'
+
+    // (옵션) 템플릿에 SVG/그라데이션 등 쓰면 추천
+    implementation 'com.openhtmltopdf:openhtmltopdf-svg-support:1.0.10'
+
+    // PDF -> PNG 렌더링
+    implementation 'org.apache.pdfbox:pdfbox:2.0.30'
 }
 
 
