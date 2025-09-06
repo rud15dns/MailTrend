@@ -25,7 +25,10 @@ public class SourceService {
     public List<Source> createBatch(List<SourceCreateReq> reqs) {
         List<Source> result = new ArrayList<>();
         for (SourceCreateReq r : reqs) {
-            result.add(create(r.title(), r.link(),r.description(), r.category())); // 기존 로직 재사용
+
+          
+            result.add(create(r.title(), r.description(), r.link(), r.category())); // 기존 로직 재사용
+
         }
         return result;
     }
