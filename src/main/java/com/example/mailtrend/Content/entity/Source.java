@@ -20,6 +20,9 @@ public class Source {
 
     private String title;
 
+    @Lob
+    private String description;
+
     @Column(length = 2000)
     private String link;
 
@@ -28,8 +31,9 @@ public class Source {
 
     private LocalDateTime createdAt;
 
-    public Source(String title, String link, Category category) {
+    public Source(String title, String description, String link, Category category) {
         this.title = title;
+        this.description = description;
         this.link = link;
         this.category = category;
         this.createdAt = LocalDateTime.now();
