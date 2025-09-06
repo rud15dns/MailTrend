@@ -4,18 +4,23 @@
     <meta charset="UTF-8"/>
     <title>월요일 AI 소식</title>
     <style>
-        body {
-            background: none;
-            font-family: 'Pretendard', 'sans-serif';
+        html, body {
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            min-height: 100%;
+            background: #f7f7fb;
+            font-family: 'Pretendard', 'sans-serif';
         }
+
+        body {
+            padding: 20px 0;
+        }
+
         .container {
             border-radius: 6px;
             width: 540px;
             padding: 0 30px;
             margin: 0 auto;
-            background: #f7f7fb;
             position: relative;
             padding-bottom: 40px;
         }
@@ -160,7 +165,8 @@
             <span>웹으로 보기</span>
         </div>
         <div class="intro-box">
-            오늘 AI 소식이 이렇게 바뀌었어요. 안 보면 진짜 손해!<br>
+            오늘 AI 소식이 이렇게 바뀌었어요. 안 보면 진짜 손해!<br/>
+            궁금하지 않나요? 😆 너만 안 보면 나 슬퍼요...
         </div>
     </div>
 
@@ -172,11 +178,29 @@
         <tr class="card-row">
             <td class="card" th:with="c=${cards != null and #lists.size(cards) > 0 ? cards[0] : null}">
                 <strong th:text="${c != null and !#strings.isEmpty(c.title) ? c.title : '제목 준비중'}">카드 제목</strong>
+
+                <!-- 기존 bullets 리스트가 있으면 사용 -->
                 <ul th:if="${c != null and c.bullets != null and !#lists.isEmpty(c.bullets)}">
                     <li th:each="b : ${c.bullets}" th:text="${b}">불릿</li>
                 </ul>
-                <p th:if="${c == null or c.bullets == null or #lists.isEmpty(c.bullets)}"
-                   th:text="${c != null and !#strings.isEmpty(c.desc) ? c.desc : '요약 준비중'}">간단 요약</p>
+
+                <!-- bullets가 없고 desc에 마크다운이 있으면 파싱해서 표시 -->
+                <th:block th:if="${c != null and (c.bullets == null or #lists.isEmpty(c.bullets)) and !#strings.isEmpty(c.desc) and #strings.contains(c.desc, '- ')}">
+                    <ul>
+                        <th:block th:each="line : ${#strings.arraySplit(c.desc, '\n')}">
+                            <li th:if="${#strings.startsWith(#strings.trim(line), '- ')}"
+                                th:text="${#strings.substring(#strings.trim(line), 2)}">마크다운 불릿</li>
+                        </th:block>
+                    </ul>
+                </th:block>
+
+                <!-- 일반 텍스트 desc (마크다운이 아닌 경우) -->
+                <p th:if="${c != null and (c.bullets == null or #lists.isEmpty(c.bullets)) and !#strings.isEmpty(c.desc) and !#strings.contains(c.desc, '- ')}"
+                   th:text="${c.desc}">간단 요약</p>
+
+                <!-- 기본값 -->
+                <p th:if="${c == null or (#strings.isEmpty(c.desc) and (c.bullets == null or #lists.isEmpty(c.bullets)))}">요약 준비중</p>
+
                 <div class="card-link">
                     <a th:if="${c != null and !#strings.isEmpty(c.link)}" th:href="${c.link}" target="_blank">원문 보러 가기</a>
                     <span th:unless="${c != null and !#strings.isEmpty(c.link)}">링크 준비중</span>
@@ -188,11 +212,25 @@
         <tr class="card-row">
             <td class="card" th:with="c=${cards != null and #lists.size(cards) > 1 ? cards[1] : null}">
                 <strong th:text="${c != null and !#strings.isEmpty(c.title) ? c.title : '제목 준비중'}">카드 제목</strong>
+
                 <ul th:if="${c != null and c.bullets != null and !#lists.isEmpty(c.bullets)}">
                     <li th:each="b : ${c.bullets}" th:text="${b}">불릿</li>
                 </ul>
-                <p th:if="${c == null or c.bullets == null or #lists.isEmpty(c.bullets)}"
-                   th:text="${c != null and !#strings.isEmpty(c.desc) ? c.desc : '요약 준비중'}">간단 요약</p>
+
+                <th:block th:if="${c != null and (c.bullets == null or #lists.isEmpty(c.bullets)) and !#strings.isEmpty(c.desc) and #strings.contains(c.desc, '- ')}">
+                    <ul>
+                        <th:block th:each="line : ${#strings.arraySplit(c.desc, '\n')}">
+                            <li th:if="${#strings.startsWith(#strings.trim(line), '- ')}"
+                                th:text="${#strings.substring(#strings.trim(line), 2)}">마크다운 불릿</li>
+                        </th:block>
+                    </ul>
+                </th:block>
+
+                <p th:if="${c != null and (c.bullets == null or #lists.isEmpty(c.bullets)) and !#strings.isEmpty(c.desc) and !#strings.contains(c.desc, '- ')}"
+                   th:text="${c.desc}">간단 요약</p>
+
+                <p th:if="${c == null or (#strings.isEmpty(c.desc) and (c.bullets == null or #lists.isEmpty(c.bullets)))}">요약 준비중</p>
+
                 <div class="card-link">
                     <a th:if="${c != null and !#strings.isEmpty(c.link)}" th:href="${c.link}" target="_blank">원문 보러 가기</a>
                     <span th:unless="${c != null and !#strings.isEmpty(c.link)}">링크 준비중</span>
@@ -204,11 +242,24 @@
         <tr class="card-row">
             <td class="card" th:with="c=${cards != null and #lists.size(cards) > 2 ? cards[2] : null}">
                 <strong th:text="${c != null and !#strings.isEmpty(c.title) ? c.title : '제목 준비중'}">카드 제목</strong>
+
                 <ul th:if="${c != null and c.bullets != null and !#lists.isEmpty(c.bullets)}">
                     <li th:each="b : ${c.bullets}" th:text="${b}">불릿</li>
                 </ul>
-                <p th:if="${c == null or c.bullets == null or #lists.isEmpty(c.bullets)}"
-                   th:text="${c != null and !#strings.isEmpty(c.desc) ? c.desc : '요약 준비중'}">간단 요약</p>
+
+                <th:block th:if="${c != null and (c.bullets == null or #lists.isEmpty(c.bullets)) and !#strings.isEmpty(c.desc) and #strings.contains(c.desc, '- ')}">
+                    <ul>
+                        <th:block th:each="bulletText : ${#strings.arraySplit(c.desc, '- ')}" th:if="${!#strings.isEmpty(#strings.trim(bulletText))}">
+                            <li th:text="${#strings.trim(bulletText)}">파싱된 불릿</li>
+                        </th:block>
+                    </ul>
+                </th:block>
+
+                <p th:if="${c != null and (c.bullets == null or #lists.isEmpty(c.bullets)) and !#strings.isEmpty(c.desc) and !#strings.contains(c.desc, '- ')}"
+                   th:text="${c.desc}">간단 요약</p>
+
+                <p th:if="${c == null or (#strings.isEmpty(c.desc) and (c.bullets == null or #lists.isEmpty(c.bullets)))}">요약 준비중</p>
+
                 <div class="card-link">
                     <a th:if="${c != null and !#strings.isEmpty(c.link)}" th:href="${c.link}" target="_blank">원문 보러 가기</a>
                     <span th:unless="${c != null and !#strings.isEmpty(c.link)}">링크 준비중</span>
@@ -220,11 +271,24 @@
         <tr class="card-row">
             <td class="card" th:with="c=${cards != null and #lists.size(cards) > 3 ? cards[3] : null}">
                 <strong th:text="${c != null and !#strings.isEmpty(c.title) ? c.title : '제목 준비중'}">카드 제목</strong>
+
                 <ul th:if="${c != null and c.bullets != null and !#lists.isEmpty(c.bullets)}">
                     <li th:each="b : ${c.bullets}" th:text="${b}">불릿</li>
                 </ul>
-                <p th:if="${c == null or c.bullets == null or #lists.isEmpty(c.bullets)}"
-                   th:text="${c != null and !#strings.isEmpty(c.desc) ? c.desc : '요약 준비중'}">간단 요약</p>
+
+                <th:block th:if="${c != null and (c.bullets == null or #lists.isEmpty(c.bullets)) and !#strings.isEmpty(c.desc) and #strings.contains(c.desc, '- ')}">
+                    <ul>
+                        <th:block th:each="bulletText : ${#strings.arraySplit(c.desc, '- ')}" th:if="${!#strings.isEmpty(#strings.trim(bulletText))}">
+                            <li th:text="${#strings.trim(bulletText)}">파싱된 불릿</li>
+                        </th:block>
+                    </ul>
+                </th:block>
+
+                <p th:if="${c != null and (c.bullets == null or #lists.isEmpty(c.bullets)) and !#strings.isEmpty(c.desc) and !#strings.contains(c.desc, '- ')}"
+                   th:text="${c.desc}">간단 요약</p>
+
+                <p th:if="${c == null or (#strings.isEmpty(c.desc) and (c.bullets == null or #lists.isEmpty(c.bullets)))}">요약 준비중</p>
+
                 <div class="card-link">
                     <a th:if="${c != null and !#strings.isEmpty(c.link)}" th:href="${c.link}" target="_blank">원문 보러 가기</a>
                     <span th:unless="${c != null and !#strings.isEmpty(c.link)}">링크 준비중</span>
@@ -236,11 +300,24 @@
         <tr class="card-row">
             <td class="card" th:with="c=${cards != null and #lists.size(cards) > 4 ? cards[4] : null}">
                 <strong th:text="${c != null and !#strings.isEmpty(c.title) ? c.title : '제목 준비중'}">카드 제목</strong>
+
                 <ul th:if="${c != null and c.bullets != null and !#lists.isEmpty(c.bullets)}">
                     <li th:each="b : ${c.bullets}" th:text="${b}">불릿</li>
                 </ul>
-                <p th:if="${c == null or c.bullets == null or #lists.isEmpty(c.bullets)}"
-                   th:text="${c != null and !#strings.isEmpty(c.desc) ? c.desc : '요약 준비중'}">간단 요약</p>
+
+                <th:block th:if="${c != null and (c.bullets == null or #lists.isEmpty(c.bullets)) and !#strings.isEmpty(c.desc) and #strings.contains(c.desc, '- ')}">
+                    <ul>
+                        <th:block th:each="bulletText : ${#strings.arraySplit(c.desc, '- ')}" th:if="${!#strings.isEmpty(#strings.trim(bulletText))}">
+                            <li th:text="${#strings.trim(bulletText)}">파싱된 불릿</li>
+                        </th:block>
+                    </ul>
+                </th:block>
+
+                <p th:if="${c != null and (c.bullets == null or #lists.isEmpty(c.bullets)) and !#strings.isEmpty(c.desc) and !#strings.contains(c.desc, '- ')}"
+                   th:text="${c.desc}">간단 요약</p>
+
+                <p th:if="${c == null or (#strings.isEmpty(c.desc) and (c.bullets == null or #lists.isEmpty(c.bullets)))}">요약 준비중</p>
+
                 <div class="card-link">
                     <a th:if="${c != null and !#strings.isEmpty(c.link)}" th:href="${c.link}" target="_blank">원문 보러 가기</a>
                     <span th:unless="${c != null and !#strings.isEmpty(c.link)}">링크 준비중</span>
