@@ -25,7 +25,7 @@ public class SourceCreateController {
 
 
 
-    @PostMapping("/create")
+    @PostMapping("/createbatch")
     public ResponseEntity<ApiResponse<List<Source>>> createBatch(
             @Valid @RequestBody List<SourceCreateReq> reqs) {
         if (reqs.size() != 5) {
@@ -39,6 +39,18 @@ public class SourceCreateController {
         List<Source> saved = sourceService.createBatch(reqs);
         return ResponseEntity.ok(ApiResponse.success(saved));
     }
+
+    @PostMapping("/create")
+    public ResponseEntity<ApiResponse<?>> create(
+            @Valid @RequestBody SourceCreateReq reqs) {
+        String description = reqs.getDescription();
+        Category category = reqs.getCategory();
+        String link = reqs.getLink();
+        String title = reqs.getTitle();
+        Source saved = sourceService.create(title,link,description,category);
+        return ResponseEntity.ok(ApiResponse.success(saved));
+    }
+
 
 
 }

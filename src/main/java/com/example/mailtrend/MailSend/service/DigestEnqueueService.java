@@ -1,6 +1,5 @@
 package com.example.mailtrend.MailSend.service;
 
-
 import com.example.mailtrend.Content.entity.MailContent;
 import com.example.mailtrend.Content.repository.MailContentRepository;
 import com.example.mailtrend.MailSend.dto.MailMessage;
@@ -13,6 +12,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class DigestEnqueueService {
@@ -31,7 +34,6 @@ public class DigestEnqueueService {
                 mailContentRepository.findTop5ByAiSummary_Source_CategoryOrderByIdDesc(category);
         if (contents.isEmpty()) return 0;
 
-        // 카드 변환(5개)
         List<MailMessage.Card> cards = contents.stream()
                 .map(mc -> MailMessage.Card.builder()
                         .title(mc.getSource().getTitle())
@@ -48,7 +50,7 @@ public class DigestEnqueueService {
 
         int count = 0;
         for (String to : recipients) {
-            String idemp = IdempoUtil.sha256(to, subject, idsSeed); // 멱등키
+            String idemp = IdempoUtil.sha256(to, subject, idsSeed);
 
             MailMessage msg = MailMessage.builder()
                     .to(to)
@@ -56,18 +58,15 @@ public class DigestEnqueueService {
                     .idempotencyKey(idemp)
                     .heroImageUrl(heroImageUrl)
                     .ctaUrl(ctaUrl)
-                    .cards(cards) // ✅ 다이제스트(5칸)
+                    .cards(cards)
                     .build();
 
-            mailEnqueueService.enqueue(msg); // ✅ 큐로
+            mailEnqueueService.enqueue(msg);
             count++;
         }
         return count;
     }
 
-    // ===== 아래 2개가 새로 추가되는 "단일 수신자"용 큐잉 메서드 =====
-
-    /** 특정 수신자에게 '지정된 5개 MailContent'로 다이제스트 큐잉 */
     @Transactional(readOnly = true)
     public void enqueueDigestTo(String to,
                                 String subject,
@@ -79,12 +78,23 @@ public class DigestEnqueueService {
             throw new IllegalArgumentException("mailContentIds must contain exactly 5 ids");
         }
 
-        // 요약/소스까지 로딩
-        List<MailContent> contents =
-                mailContentRepository.findAllByIdFetchSummaryAndSource(mailContentIds);
-        if (contents.size() != 5) {
+        // ✅ 연관까지 로딩
+        List<MailContent> fetched = mailContentRepository.findAllByIdIn(mailContentIds);
+        if (fetched.size() < 5) {
             throw new IllegalArgumentException("Some MailContent ids are invalid");
         }
+
+        // ✅ 입력 ID 순서로 재정렬
+        Map<Long, MailContent> byId = fetched.stream()
+                .collect(Collectors.toMap(MailContent::getId, Function.identity()));
+
+        List<MailContent> contents = mailContentIds.stream()
+                .map(id -> {
+                    MailContent mc = byId.get(id);
+                    if (mc == null) throw new IllegalArgumentException("Invalid MailContent id: " + id);
+                    return mc;
+                })
+                .toList();
 
         List<MailMessage.Card> cards = contents.stream()
                 .map(mc -> MailMessage.Card.builder()
@@ -105,9 +115,9 @@ public class DigestEnqueueService {
                 .idempotencyKey(idemp)
                 .heroImageUrl(heroImageUrl)
                 .ctaUrl(ctaUrl)
-                .cards(cards) // ✅ 5칸
+                .cards(cards)
                 .build();
 
-        mailEnqueueService.enqueue(msg); // ✅ 큐에 싣기 (리스너가 발송)
+        mailEnqueueService.enqueue(msg);
     }
 }
