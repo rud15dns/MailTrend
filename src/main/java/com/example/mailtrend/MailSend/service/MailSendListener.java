@@ -17,7 +17,7 @@ public class MailSendListener {
 
     private final MailgunService mailgunService;
     private final ObjectMapper objectMapper; // JSON 파싱
-
+    private final MailOrchestrator mailOrchestrator;
     @Value("${mailgun.from}")
     private String defaultFrom;
 
@@ -34,12 +34,7 @@ public class MailSendListener {
         String html = composeHtml(msg.getSummary(), msg.getOriginal());
 
         // 실패 시 예외 던져 재시도 (at-least-once 특성상 중복 주의)
-        mailgunService
-                .sendSimpleEmail(defaultFrom, msg.getTo(), msg.getSubject(), text, html)
-                .doOnSuccess(r -> log.info("Mailgun sent: to={}, subject={}", msg.getTo(), msg.getSubject()))
-                .doOnError(e -> log.warn("Mailgun send failed: to={}, subject={}, err={}",
-                        msg.getTo(), msg.getSubject(), e.toString()))
-                .block();
+
     }
 
     // ↓↓↓ 여기 둘이 같은 클래스 “안”에 있어야 합니다.

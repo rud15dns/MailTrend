@@ -36,5 +36,5 @@ src/main/resources/application-prod.properties
 
 ### VS Code ###
 .vscode/
-.env
+*.env
 

@@ -49,6 +49,9 @@ dependencies {
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+// 메일 보내기 template을 위한 것
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 }
 
 

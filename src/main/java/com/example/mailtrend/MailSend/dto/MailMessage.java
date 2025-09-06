@@ -10,22 +10,20 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.List;
-@Entity
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class MailMessage implements Serializable {
-    @NotBlank @Id
-    private String to;
+    @NotBlank private String to;
     @NotBlank private String subject;
-
-    // SummaryService가 만든 요약
     private String summary;
-
-    // 원문(필요하면 일부만 저장해도 됨)
     private String original;
-
-    // FIFO 중복 제거용 키
     @NotBlank private String idempotencyKey;
+    public MailMessage(String to, String subject, String summary, String original, String idempotencyKey) {
+        this(to, subject, summary, original, idempotencyKey, null, null);
+    }
+    // 선택 (추가)
+    private String heroImageUrl;
+    private String ctaUrl;
 }

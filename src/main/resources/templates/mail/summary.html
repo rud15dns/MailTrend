@@ -1,0 +1,94 @@
+<!-- src/main/resources/templates/mail/summary.html -->
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8" />
+    <title th:text="${subject}">MailTrend</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+<body style="margin:0;padding:0;background-color:#f5f7fb;">
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#f5f7fb;">
+    <tr>
+        <td align="center" style="padding:24px 12px;">
+            <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="width:600px;max-width:100%;background:#ffffff;border-radius:10px;overflow:hidden;border:1px solid #e6e8ef;">
+                <!-- 헤더 -->
+                <tr>
+                    <td style="background:#111827;color:#fff;padding:20px 24px;font-family:Arial,Helvetica,sans-serif;">
+                        <div style="font-size:18px;font-weight:bold;">MailTrend</div>
+                        <div style="font-size:12px;opacity:.85;margin-top:4px;">Daily Tech Briefing</div>
+                    </td>
+                </tr>
+
+                <!-- 히어로 이미지 (옵션) -->
+                <tr th:if="${heroImageUrl}">
+                    <td>
+                        <img th:src="${heroImageUrl}" alt="hero" width="600" style="display:block;width:100%;height:auto;border:0;" />
+                    </td>
+                </tr>
+
+                <!-- 요약 카드 -->
+                <tr>
+                    <td style="padding:24px;">
+                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                            <tr>
+                                <td style="font-family:Arial,Helvetica,sans-serif;">
+                                    <div style="font-size:20px;font-weight:700;color:#111827;" th:text="${subject}">오늘의 요약</div>
+                                    <div style="margin-top:10px;font-size:14px;line-height:1.7;color:#374151;" th:text="${summary}">
+                                        오늘의 핵심 요약…
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <!-- 원문 하이라이트(옵션) -->
+                <tr th:if="${original}">
+                    <td style="padding:0 24px 8px;">
+                        <div style="font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#6b7280;">원문 하이라이트</div>
+                    </td>
+                </tr>
+                <tr th:if="${original}">
+                    <td style="padding:0 24px 24px;">
+                        <div style="font-family:Courier,monospace;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:8px;padding:12px;color:#111827;white-space:pre-wrap;"
+                             th:text="${original}">
+                            일부 발췌…
+                        </div>
+                    </td>
+                </tr>
+
+                <!-- 5개 소스 리스트 -->
+                <tr th:if="${sources}">
+                    <td style="padding:0 24px 24px;">
+                        <div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:700;margin-bottom:8px;color:#111827;">오늘의 소스 5</div>
+                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                            <tr th:each="src,iter : ${sources}">
+                                <td style="padding:8px 0;border-bottom:1px solid #eef2f7;">
+                                    <a th:href="${src.link}" th:text="|${iter.index + 1}. ${src.title}|"
+                                       style="font-family:Arial,Helvetica,sans-serif;text-decoration:none;color:#2563eb;"></a>
+                                    <div style="font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#6b7280;" th:text="${src.category}">AI</div>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <!-- CTA -->
+                <tr>
+                    <td style="padding:0 24px 28px;">
+                        <a th:href="${ctaUrl}" style="display:inline-block;background:#111827;color:#fff;text-decoration:none;padding:10px 16px;border-radius:8px;font-family:Arial,Helvetica,sans-serif;font-size:14px;">전체 보기</a>
+                    </td>
+                </tr>
+
+                <!-- 푸터 -->
+                <tr>
+                    <td style="background:#111827;color:#9ca3af;padding:16px 24px;font-family:Arial,Helvetica,sans-serif;font-size:12px;">
+                        © MailTrend · 자동 발송 메일입니다.
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

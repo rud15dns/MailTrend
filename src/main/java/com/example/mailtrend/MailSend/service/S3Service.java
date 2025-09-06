@@ -1,4 +1,5 @@
 package com.example.mailtrend.MailSend.service;
+import io.micrometer.common.lang.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -15,6 +16,7 @@ import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
 @RequiredArgsConstructor
 public class S3Service {
 
+
     private final S3Client s3;
 
     @Value("${cloud.aws.s3.bucket}")
@@ -23,35 +25,104 @@ public class S3Service {
     @Value("${app.s3.prefix:}")
     private String prefix; // 예: "mailtrend/"
 
-    private String key(String fileName) {
-        if (prefix == null || prefix.isBlank()) return fileName;
-        // prefix가 "mailtrend/" 형태라고 가정
-        return prefix + fileName;
+    // ---------- 내부 유틸 ----------
+    private String normalizedPrefix() {
+        if (prefix == null || prefix.isBlank()) return "";
+        return prefix.endsWith("/") ? prefix : prefix + "/";
     }
 
-    /** 공개 객체라면 정적 URL 반환 */
-    public String getThumbnailPath(String fileName) {
-        String objectKey = key(fileName);
-
-        // 존재 체크(선택)
-        s3.headObject(HeadObjectRequest.builder()
-                .bucket(bucket)
-                .key(objectKey)
-                .build());
-
-        // 안전하게 SDK가 생성한 URL 사용
-        S3Utilities utils = s3.utilities();
-        return utils.getUrl(GetUrlRequest.builder()
-                .bucket(bucket)
-                .key(objectKey)
-                .build()).toString();
-        // presigned URL이 필요하면 S3Presigner 사용
+    private String buildKey(String originalFilename) {
+        String safeName = (originalFilename == null || originalFilename.isBlank()) ? "file" : originalFilename;
+        String datePath = java.time.LocalDate.now().toString().replace("-", "/"); // yyyy/MM/dd
+        String uuid = java.util.UUID.randomUUID().toString();
+        return normalizedPrefix() + datePath + "/" + uuid + "-" + safeName;
     }
 
-    public void deleteFile(String fileName) {
-        s3.deleteObject(software.amazon.awssdk.services.s3.model.DeleteObjectRequest.builder()
-                .bucket(bucket)
-                .key(key(fileName))
-                .build());
+    private String toPublicUrl(String key) {
+        return s3.utilities().getUrl(GetUrlRequest.builder().bucket(bucket).key(key).build()).toString();
+    }
+
+    // ---------- 조회 ----------
+    /** 객체 존재 체크(선택) */
+    public boolean exists(String key) {
+        try {
+            s3.headObject(HeadObjectRequest.builder().bucket(bucket).key(key).build());
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /** 공개 버킷이면 정적 URL 반환 */
+    public String getPublicUrl(String key) {
+        return toPublicUrl(key);
+    }
+
+    // ---------- 업로드 (여러 오버로드) ----------
+    /** 바이트 배열 업로드 → 공개 URL 반환 */
+    public String upload(byte[] bytes, String filename, @Nullable String contentType) {
+        String key = buildKey(filename);
+        s3.putObject(
+                software.amazon.awssdk.services.s3.model.PutObjectRequest.builder()
+                        .bucket(bucket)
+                        .key(key)
+                        .contentType((contentType == null || contentType.isBlank()) ? "application/octet-stream" : contentType)
+                        .build(),
+                software.amazon.awssdk.core.sync.RequestBody.fromBytes(bytes)
+        );
+        return toPublicUrl(key);
+    }
+
+    /** InputStream 업로드 → 공개 URL 반환 (대용량 스트림용) */
+    public String upload(java.io.InputStream is, long contentLength, String filename, @Nullable String contentType) throws java.io.IOException {
+        String key = buildKey(filename);
+        s3.putObject(
+                software.amazon.awssdk.services.s3.model.PutObjectRequest.builder()
+                        .bucket(bucket)
+                        .key(key)
+                        .contentType((contentType == null || contentType.isBlank()) ? "application/octet-stream" : contentType)
+                        .build(),
+                software.amazon.awssdk.core.sync.RequestBody.fromInputStream(is, contentLength)
+        );
+        return toPublicUrl(key);
+    }
+
+    /** MultipartFile 업로드 → 공개 URL 반환 (컨트롤러에서 바로 사용) */
+    public String upload(org.springframework.web.multipart.MultipartFile file) throws java.io.IOException {
+        String key = buildKey(file.getOriginalFilename());
+        String ct = (file.getContentType() == null || file.getContentType().isBlank()) ? "application/octet-stream" : file.getContentType();
+        s3.putObject(
+                software.amazon.awssdk.services.s3.model.PutObjectRequest.builder()
+                        .bucket(bucket)
+                        .key(key)
+                        .contentType(ct)
+                        .build(),
+                software.amazon.awssdk.core.sync.RequestBody.fromBytes(file.getBytes())
+        );
+        return toPublicUrl(key);
+    }
+
+    /** URL 대신 S3 key만 받고 싶을 때 */
+    public String uploadAndReturnKey(byte[] bytes, String filename, @Nullable String contentType) {
+        String key = buildKey(filename);
+        s3.putObject(
+                software.amazon.awssdk.services.s3.model.PutObjectRequest.builder()
+                        .bucket(bucket)
+                        .key(key)
+                        .contentType((contentType == null || contentType.isBlank()) ? "application/octet-stream" : contentType)
+                        .build(),
+                software.amazon.awssdk.core.sync.RequestBody.fromBytes(bytes)
+        );
+        return key;
+    }
+
+    // ---------- 삭제 ----------
+    public void deleteByKey(String key) {
+        s3.deleteObject(DeleteObjectRequest.builder().bucket(bucket).key(key).build());
+    }
+
+    public void deleteByFilename(String filename) {
+        String key = normalizedPrefix() + filename;
+        deleteByKey(key);
     }
 }
