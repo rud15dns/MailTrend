@@ -33,7 +33,6 @@ public class SourceService {
         return result;
     }
 
-
     @Transactional
     public Source create(String title, String description, String link, Category category) {
         Source saved = sourceRepository.save(new Source(title, description, link, category));
