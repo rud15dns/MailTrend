@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>수요일 FE 소식</title>
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            background: none;
+            font-family: 'pretended', 'sans-serif';
+            margin: 0;
+            padding: 0;
+            position: relative;
+            min-height: 100vh;
+        }
+        .container {
+            border-radius: 6px;
+            width: 540px;
+            padding: 0 30px;
+            margin: 0 auto;
+            background: #f7f7fb;
+            position: relative;
+            z-index: 0;
+            padding-bottom: 40px;
+        }
+        .header {
+            padding: 20px 0 16px 0;
+        }
+        .to {
+            margin-left: 8px;
+            color: #111;
+            font-size: 20px;
+            font-style: normal;
+            font-weight: 700;
+            line-height: 120%; /* 24px */
+        }
+        .main-title {
+            color: #111;
+            font-size: 32px;
+            font-style: normal;
+            font-weight: 700;
+            line-height: 120%; /* 38.4px */
+            margin-top: 16px;
+            margin-bottom: 20px;
+        }
+        .menu-bar {
+            color: #111;
+            font-size: 14px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 120%; /* 16.8px */
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+        .menu-bar > span {
+            padding: 10px;
+        }
+        .intro-box {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 0 0 transparent;
+            padding: 12px 20px;
+            color: #111;
+            font-family: Pretendard;
+            font-size: 16px;
+            font-style: normal;
+            font-weight: 400;
+            line-height: 160%; /* 25.6px */
+            border: 1px solid #dfdfdf;
+        }
+        .section-title {
+            color: #a059e6;
+            color: #9112BC;
+            font-family: Pretendard;
+            font-size: 22px;
+            font-style: normal;
+            font-weight: 700;
+            line-height: 120%; /* 26.4px */
+            margin: 40px 0 12px 8px;
+        }
+        .card-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .card {
+            display: flex;
+            padding: 19px 20px;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+            align-self: stretch;
+
+            border-radius: 10px;
+            border: 1px solid #DFDFDF;
+            background: #FFF;
+
+            position: relative;
+        }
+        .card strong {
+            color: #111;
+            font-family: Pretendard;
+            font-size: 18px;
+            font-style: normal;
+            font-weight: 700;
+            line-height: 120%; /* 21.6px */
+        }
+        .card ul {
+            color: #111;
+            font-family: Pretendard;
+            font-size: 16px;
+            font-style: normal;
+            font-weight: 400;
+            line-height: 160%; /* 25.6px */
+            margin: 0px;
+            padding-left: 20px;
+        }
+        .card a {
+            position: absolute;
+            right: 20px;
+            bottom: 13px;
+            color: #111;
+            font-family: Pretendard;
+            font-size: 12px;
+            font-style: normal;
+            font-weight: 400;
+            line-height: 160%; /* 19.2px */
+            text-decoration-line: underline;
+            text-decoration-style: solid;
+            text-decoration-skip-ink: auto;
+            text-decoration-thickness: auto;
+            text-underline-offset: auto;
+            text-underline-position: from-font;
+        }
+        .mini-section-title {
+            color: #9112BC;
+            font-family: Pretendard;
+            font-size: 22px;
+            font-style: normal;
+            font-weight: 700;
+            line-height: 120%; /* 26.4px */
+            margin: 40px 0 12px 8px;
+        }
+        .word-list {
+            background: #fff;
+            border-radius: 10px;
+            padding: 20px 20px;
+            border: 1px solid #dfdfdf;
+        }
+        .word-list li {
+            color: #111;
+            font-family: Pretendard;
+            font-size: 16px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 160%;
+            list-style-type: none;
+            position: relative;
+            padding-left: 10px;
+        }
+        .word-list li::before {
+            content: '*';
+            color: #FF6B6B;
+            font-family: Pretendard;
+            font-size: 16px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 160%; /* 25.6px */
+            position: absolute;
+            left: 0;
+            top: 0;
+            right: 0;
+        }
+        .word-list b {
+            font-weight: 700;
+        }
+        .footer-svg {
+            position: relative;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 180px;
+            z-index: 0;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+
+        <div class="main-title">수요일 프론트엔드 소식이 도착했어요</div>
+        <div class="menu-bar">
+            <span>이전 기사 보기</span>
+            |
+            <span>웹으로 보기</span>
+        </div>
+        <div class="intro-box">
+            오늘 AI 소식이 이렇게 바뀌었어요. 안 보면 진짜 손해!<br>
+            궁금하지 않나요? 😆 너만 안 보면 나 슬퍼요...
+        </div>
+    </div>
+    <div class="section-title">오늘의 트렌드</div>
+    <div class="card-list">
+        <!-- 카드 0 -->
+        <div class="card"
+             th:with="c=${cards != null and #lists.size(cards) > 0 ? cards[0] : null}">
+            <strong th:text="${c != null and !#strings.isEmpty(c.title) ? c.title : '제목 준비중'}">카드 제목</strong>
+
+            <ul th:if="${c != null and c.bullets != null and !#lists.isEmpty(c.bullets)}">
+                <li th:each="b : ${c.bullets}" th:text="${b}">불릿</li>
+            </ul>
+            <p th:if="${c == null or c.bullets == null or #lists.isEmpty(c.bullets)}"
+               th:text="${c != null and !#strings.isEmpty(c.desc) ? c.desc : '요약 준비중'}">간단 요약</p>
+
+            <a th:if="${c != null and !#strings.isEmpty(c.link)}" th:href="${c.link}" target="_blank">원문 보러 가기</a>
+            <span th:if="${c == null or #strings.isEmpty(c.link)}">링크 준비중</span>
+        </div>
+
+        <!-- 카드 1 -->
+        <div class="card"
+             th:with="c=${cards != null and #lists.size(cards) > 1 ? cards[1] : null}">
+            <strong th:text="${c != null and !#strings.isEmpty(c.title) ? c.title : '제목 준비중'}">카드 제목</strong>
+
+            <ul th:if="${c != null and c.bullets != null and !#lists.isEmpty(c.bullets)}">
+                <li th:each="b : ${c.bullets}" th:text="${b}">불릿</li>
+            </ul>
+            <p th:if="${c == null or c.bullets == null or #lists.isEmpty(c.bullets)}"
+               th:text="${c != null and !#strings.isEmpty(c.desc) ? c.desc : '요약 준비중'}">간단 요약</p>
+
+            <a th:if="${c != null and !#strings.isEmpty(c.link)}" th:href="${c.link}" target="_blank">원문 보러 가기</a>
+            <span th:if="${c == null or #strings.isEmpty(c.link)}">링크 준비중</span>
+        </div>
+
+        <!-- 카드 2 -->
+        <div class="card"
+             th:with="c=${cards != null and #lists.size(cards) > 2 ? cards[2] : null}">
+            <strong th:text="${c != null and !#strings.isEmpty(c.title) ? c.title : '제목 준비중'}">카드 제목</strong>
+
+            <ul th:if="${c != null and c.bullets != null and !#lists.isEmpty(c.bullets)}">
+                <li th:each="b : ${c.bullets}" th:text="${b}">불릿</li>
+            </ul>
+            <p th:if="${c == null or c.bullets == null or #lists.isEmpty(c.bullets)}"
+               th:text="${c != null and !#strings.isEmpty(c.desc) ? c.desc : '요약 준비중'}">간단 요약</p>
+
+            <a th:if="${c != null and !#strings.isEmpty(c.link)}" th:href="${c.link}" target="_blank">원문 보러 가기</a>
+            <span th:if="${c == null or #strings.isEmpty(c.link)}">링크 준비중</span>
+        </div>
+
+        <!-- 카드 3 -->
+        <div class="card"
+             th:with="c=${cards != null and #lists.size(cards) > 3 ? cards[3] : null}">
+            <strong th:text="${c != null and !#strings.isEmpty(c.title) ? c.title : '제목 준비중'}">카드 제목</strong>
+
+            <ul th:if="${c != null and c.bullets != null and !#lists.isEmpty(c.bullets)}">
+                <li th:each="b : ${c.bullets}" th:text="${b}">불릿</li>
+            </ul>
+            <p th:if="${c == null or c.bullets == null or #lists.isEmpty(c.bullets)}"
+               th:text="${c != null and !#strings.isEmpty(c.desc) ? c.desc : '요약 준비중'}">간단 요약</p>
+
+            <a th:if="${c != null and !#strings.isEmpty(c.link)}" th:href="${c.link}" target="_blank">원문 보러 가기</a>
+            <span th:if="${c == null or #strings.isEmpty(c.link)}">링크 준비중</span>
+        </div>
+
+        <!-- 카드 4 -->
+        <div class="card"
+             th:with="c=${cards != null and #lists.size(cards) > 4 ? cards[4] : null}">
+            <strong th:text="${c != null and !#strings.isEmpty(c.title) ? c.title : '제목 준비중'}">카드 제목</strong>
+
+            <ul th:if="${c != null and c.bullets != null and !#lists.isEmpty(c.bullets)}">
+                <li th:each="b : ${c.bullets}" th:text="${b}">불릿</li>
+            </ul>
+            <p th:if="${c == null or c.bullets == null or #lists.isEmpty(c.bullets)}"
+               th:text="${c != null and !#strings.isEmpty(c.desc) ? c.desc : '요약 준비중'}">간단 요약</p>
+
+            <a th:if="${c != null and !#strings.isEmpty(c.link)}" th:href="${c.link}" target="_blank">원문 보러 가기</a>
+            <span th:if="${c == null or #strings.isEmpty(c.link)}">링크 준비중</span>
+        </div>
+    </div>
+
+
+
+    <div class="footer-svg">
+        <svg xmlns="http://www.w3.org/2000/svg" width="600" height="255" viewBox="0 0 600 255" fill="none">
+            <!-- 첫 번째 삼각형(좌측) -->
+            <path d="M16.8 1.6
+                   C9.6 -1.5 0 3.4 0 10.7
+                   L0 245
+                   C0 250.5 5.1 255 11.9 255
+                   H569.2
+                   C580.5 255 583.9 240.4 574.8 235.9
+                   L16.8 1.6Z"
+                  fill="url(#gradient1)" />
+            <!-- 두 번째 삼각형(우측) -->
+            <path d="M582.1 1.6
+                   C588.8 -1.5 600 3.4 600 10.7
+                   L600 245
+                   C600 250.5 593.7 255 587 255
+                   H86.2
+                   C75.2 255 72.1 240.4 81.4 235.9
+                   L582.1 1.6Z"
+                  fill="url(#gradient2)" />
+            <!-- 가운데 삼각형(상단 → 아래로 79px 이동) -->
+            <path d="M0 151.6
+                   C0 146.9 3.8 142.8 8.7 141.8
+                   L298.7 79.5
+                   C300 79.2 301.6 79.2 302.9 79.5
+                   L591.3 141.8
+                   C596.2 142.8 600 146.9 600 151.6
+                   V250
+                   C600 255.5 595.5 260 590 260
+                   H11.9
+                   C5.1 260 0 255.5 0 250
+                   V151.6Z"
+                  fill="url(#gradient3)" />
+            <defs>
+                <linearGradient id="gradient1" x1="570" y1="3" x2="300" y2="449" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#E3BDEC"/>
+                    <stop offset="1" stop-color="#9747FF"/>
+                </linearGradient>
+                <linearGradient id="gradient2" x1="6" y1="3" x2="244" y2="449" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#E3BDEC"/>
+                    <stop offset="1" stop-color="#9747FF"/>
+                </linearGradient>
+                <linearGradient id="gradient3" x1="0" y1="84.6" x2="84.7" y2="334" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#E3BDEC"/>
+                    <stop offset="1" stop-color="#9747FF"/>
+                </linearGradient>
+            </defs>
+        </svg>
+
+    </div>
+</div>
+<!-- 삼각형 세 개 SVG 그라데이션 -->
+</body>
+</html>
