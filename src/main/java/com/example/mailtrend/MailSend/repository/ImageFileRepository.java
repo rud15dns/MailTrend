@@ -1,9 +1,12 @@
 package com.example.mailtrend.MailSend.repository;
 
-import com.example.mailtrend.MailSend.dto.MailMessage;
+
+import com.example.mailtrend.MailSend.entity.ImageFile;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface MailRepostiroy extends JpaRepository<MailMessage, Long> {
+public interface ImageFileRepository extends JpaRepository<ImageFile, Long> {
+
+
 }

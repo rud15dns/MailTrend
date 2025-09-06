@@ -1,5 +1,7 @@
 package com.example.mailtrend.MailSend.dto;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,13 +10,13 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.List;
-
+@Entity
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class MailMessage implements Serializable {
-    @NotBlank
+    @NotBlank @Id
     private String to;
     @NotBlank private String subject;
 
