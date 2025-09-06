@@ -1,7 +1,11 @@
 package com.example.mailtrend.MailSend.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
+import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.example.mailtrend.MailSend.entity.ImageFile;
+import com.example.mailtrend.MailSend.repository.ImageFileRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.User;
@@ -14,6 +18,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Component
@@ -27,10 +32,10 @@ public class S3Service {
     @Value("${cloud.aws.s3.bucket}")                                                        //bucket 이름
     public String bucket;
 
-    public void upload(MultipartFile multipartFile, String dirName, Board board, User user) throws IOException {
+    public void upload(MultipartFile multipartFile, String dirName) throws IOException {
         File uploadFile = convert(multipartFile).orElseThrow(() -> new IllegalArgumentException("파일 전환 실패"));
 
-        ImageFile imageFile = new ImageFile(upload(uploadFile, dirName), user, board);
+        ImageFile imageFile = new ImageFile(upload(uploadFile, dirName));
         imageFileRepository.save(imageFile);
 //        return upload(uploadFile, dirName);
     }

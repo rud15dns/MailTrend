@@ -1,5 +1,10 @@
 package com.example.mailtrend.MailSend.entity;
 
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.apache.catalina.User;
+
 @Getter
 @Entity
 @NoArgsConstructor
@@ -11,17 +16,10 @@ public class ImageFile {
     @Column(nullable = false)           // image 경로
     private String path;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userid", nullable = false)
-    private User user;                  // userid
 
-    @OneToOne
-    @JoinColumn(name = "boardid", nullable = false)
-    private Board board;
 
-    public ImageFile(String path, User user, Board board){
+    public ImageFile(String path){
         this.path = path;
-        this.user = user;
-        this.board = board;
+
     }
 }

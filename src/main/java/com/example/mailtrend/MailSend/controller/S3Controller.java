@@ -13,7 +13,7 @@ public class S3Controller {
     private final S3Service s3Uploader;
 
     @GetMapping("/images")
-    public String getImage(@AuthenticationPrincipal UserDetailsImpl userDetails)throws IOException {
+    public String getImage()throws IOException {
         return s3Uploader.getThumbnailPath("img.png");
     }
 
