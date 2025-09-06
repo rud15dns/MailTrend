@@ -71,6 +71,7 @@ public class MemberController {
 
             // 최신 5개 AI 콘텐츠로 즉시 발송 (block)
             log.info("AI 콘텐츠 즉시 발송");
+            // 여기서 에러가 났음
             digestEnqueueService.sendLatest5NowTo(
 
                     request.getEmail(),
