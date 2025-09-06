@@ -8,6 +8,7 @@ import com.example.mailtrend.oauth.entity.Category;
 import com.example.mailtrend.oauth.repository.MemberRepository;
 import io.micrometer.common.lang.Nullable;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
@@ -16,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DigestEnqueueService {
@@ -129,15 +130,17 @@ public class DigestEnqueueService {
                                  String subject,          // null이면 기본값
                                  String heroImageUrl,     // 옵션
                                  String ctaUrl) {         // 옵션
-
+log.info("content 생성 잘되려함");
         List<MailContent> contents =
                 mailContentRepository.findTop5ByAiSummary_Source_CategoryOrderByIdDesc(category);
-
+        log.info("content 생성 잘되는중");
         if (contents.size() < 5) {
+            log.info("5개미만이라 죽음");
             throw new IllegalStateException("다이제스트용 콘텐츠가 5개 미만입니다 (category=" + category + ")");
         }
-
+        log.info("content 생성 잘됨");
         // 카드 변환
+        log.info("content 카드 잘되려함");
         List<MailMessage.Card> cards = contents.stream()
                 .map(mc -> MailMessage.Card.builder()
                         .title(mc.getSource().getTitle())
@@ -145,16 +148,16 @@ public class DigestEnqueueService {
                         .link(mc.getSource().getLink())
                         .build())
                 .toList();
-
+        log.info("content 카드 생성 ");
         String finalSubject = (subject == null || subject.isBlank())
-                ? "[MailTrend] 오늘의 " + category.name() + " 소식 5 - " 
+                ? "[MailTrend] 오늘의 " + category.name() + " 소식 5 - "
                 : subject;
-
+        log.info("content  finalsubject");
         // 멱등키: 수신자 + 제목 + mailContent id들
         String idsSeed = contents.stream().map(mc -> String.valueOf(mc.getId()))
                 .reduce((a,b) -> a + "," + b).orElse("none");
         String idemp = com.example.mailtrend.MailSend.entity.IdempoUtil.sha256(to, finalSubject, idsSeed);
-
+        log.info("mailmessage 생성");
         MailMessage msg = MailMessage.builder()
                 .to(to)
                 .subject(finalSubject)
@@ -163,9 +166,10 @@ public class DigestEnqueueService {
                 .ctaUrl(ctaUrl)
                 .cards(cards)
                 .build();
-
+        log.info("동기 발송 직전  ");
         // ✅ 인라인(동기) 발송: 여기서 끝까지 보내고 반환
         Mono<String> sent = mailOrchestrator.sendMessage(msg);
         sent.block(); // 해커톤 요구: subscribe 요청 내에서 끝까지 수행
+        log.info("동기 발생됨");
     }
 }
