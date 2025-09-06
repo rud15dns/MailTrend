@@ -23,7 +23,7 @@ public class Source {
     @Lob
     private String description;
 
-    @Column(length = 2000)
+    @Lob
     private String link;
 
     @Enumerated(EnumType.STRING)
