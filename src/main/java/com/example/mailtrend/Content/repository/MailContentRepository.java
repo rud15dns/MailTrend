@@ -2,6 +2,7 @@ package com.example.mailtrend.Content.repository;
 
 import com.example.mailtrend.Content.entity.MailContent;
 import com.example.mailtrend.oauth.entity.Category;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -23,4 +24,8 @@ public interface MailContentRepository extends JpaRepository<MailContent, Long> 
       where mc.id = :id
     """)
     Optional<MailContent> findByIdWithSummaryAndSource(@Param("id") Long id);
+
+    List<MailContent> findAllByIdFetchSummaryAndSource(@Param("ids") List<Long> ids);
+    @EntityGraph(attributePaths = {"aiSummary", "aiSummary.source"})
+    List<MailContent> findTop5ByAiSummary_Source_CategoryOrderByIdDesc(Category category);
 }

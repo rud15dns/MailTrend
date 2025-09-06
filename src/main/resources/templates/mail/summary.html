@@ -3,92 +3,110 @@
 <html lang="ko" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8" />
-    <title th:text="${subject}">MailTrend</title>
+    <title th:text="${subject}">월요일 AI 소식</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        /* 기존 스타일 유지 + 번호 뱃지/플레이스홀더만 추가 */
+        body { display:flex; align-items:center; background:none; font-family:'Pretendard','sans-serif'; margin:0; padding:0; min-height:100vh; }
+        .container { border-radius:6px; width:540px; padding:0 30px 40px; margin:0 auto; background:#f7f7fb; position:relative; z-index:0; }
+        .header { padding:20px 0 16px 0; }
+        .to { margin-left:8px; color:#111; font-size:20px; font-weight:700; line-height:120%; }
+        .main-title { color:#111; font-size:32px; font-weight:700; line-height:120%; margin:16px 0 20px; }
+        .menu-bar { color:#111; font-size:14px; font-weight:500; line-height:120%; display:flex; justify-content:flex-end; align-items:center; gap:8px; }
+        .menu-bar > a { color:#111; text-decoration:none; padding:10px; }
+        .intro-box { background:#fff; border-radius:14px; padding:12px 20px; color:#111; font-size:16px; line-height:160%; border:1px solid #dfdfdf; }
+        .section-title { color:#9112BC; font-size:22px; font-weight:700; line-height:120%; margin:40px 0 12px 8px; }
+
+        .card-list { display:flex; flex-direction:column; gap:4px; }
+        .card { position:relative; display:flex; padding:19px 20px 34px; flex-direction:column; gap:10px; border-radius:10px; border:1px solid #DFDFDF; background:#FFF; }
+        .card strong { color:#111; font-size:18px; font-weight:700; line-height:120%; padding-left:28px; }
+        .card ul { color:#111; font-size:16px; line-height:160%; margin:0; padding-left:20px; }
+        .card p { color:#111; font-size:16px; line-height:160%; margin:0; }
+        .card a.view { position:absolute; right:20px; bottom:10px; color:#111; font-size:12px; text-decoration:underline; }
+        .card span.view-disabled { position:absolute; right:20px; bottom:10px; color:#666; font-size:12px; opacity:.6; }
+
+        /* 번호 뱃지 */
+        .num-badge {
+            position:absolute; left:14px; top:14px;
+            width:20px; height:20px; border-radius:50%;
+            display:flex; align-items:center; justify-content:center;
+            font-size:12px; font-weight:700; color:#fff; background:#9112BC;
+        }
+
+        /* 플레이스홀더(비어있을 때) */
+        .placeholder { color:#6b7280; }
+    </style>
 </head>
-<body style="margin:0;padding:0;background-color:#f5f7fb;">
-<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#f5f7fb;">
-    <tr>
-        <td align="center" style="padding:24px 12px;">
-            <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="width:600px;max-width:100%;background:#ffffff;border-radius:10px;overflow:hidden;border:1px solid #e6e8ef;">
-                <!-- 헤더 -->
-                <tr>
-                    <td style="background:#111827;color:#fff;padding:20px 24px;font-family:Arial,Helvetica,sans-serif;">
-                        <div style="font-size:18px;font-weight:bold;">MailTrend</div>
-                        <div style="font-size:12px;opacity:.85;margin-top:4px;">Daily Tech Briefing</div>
-                    </td>
-                </tr>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="to">To. <span th:text="${toName != null ? toName : '○○'}">○○</span>님</div>
+        <div class="main-title" th:text="${mainTitle != null ? mainTitle : subject}">월요일 AI 소식이 도착했어요</div>
+        <div class="menu-bar">
+            <a th:href="${prevUrl != null ? prevUrl : '#'}">이전 기사 보기</a>
+            <span>|</span>
+            <a th:href="${webUrl != null ? webUrl : '#'}">웹으로 보기</a>
+        </div>
+        <div class="intro-box"
+             th:utext="${introHtml != null ? introHtml : (summary != null ? summary : '오늘 AI 소식이 이렇게 바뀌었어요...')}">
+            오늘 AI 소식이 이렇게 바뀌었어요. 안 보면 진짜 손해!<br>궁금하지 않나요? 😆 너만 안 보면 나 슬퍼요...
+        </div>
+    </div>
 
-                <!-- 히어로 이미지 (옵션) -->
-                <tr th:if="${heroImageUrl}">
-                    <td>
-                        <img th:src="${heroImageUrl}" alt="hero" width="600" style="display:block;width:100%;height:auto;border:0;" />
-                    </td>
-                </tr>
+    <div class="section-title">오늘의 트렌드</div>
 
-                <!-- 요약 카드 -->
-                <tr>
-                    <td style="padding:24px;">
-                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
-                            <tr>
-                                <td style="font-family:Arial,Helvetica,sans-serif;">
-                                    <div style="font-size:20px;font-weight:700;color:#111827;" th:text="${subject}">오늘의 요약</div>
-                                    <div style="margin-top:10px;font-size:14px;line-height:1.7;color:#374151;" th:text="${summary}">
-                                        오늘의 핵심 요약…
-                                    </div>
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
+    <div class="card-list">
+        <!-- 항상 1..5까지 고정 출력. cards가 부족하면 플레이스홀더로 채움 -->
+        <div class="card"
+             th:each="i : ${#numbers.sequence(1,5)}"
+             th:with="c=${(cards != null and cards.size() >= i) ? cards[i-1] : null}">
+            <!-- 번호 뱃지 -->
+            <div class="num-badge" th:text="${i}">1</div>
 
-                <!-- 원문 하이라이트(옵션) -->
-                <tr th:if="${original}">
-                    <td style="padding:0 24px 8px;">
-                        <div style="font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#6b7280;">원문 하이라이트</div>
-                    </td>
-                </tr>
-                <tr th:if="${original}">
-                    <td style="padding:0 24px 24px;">
-                        <div style="font-family:Courier,monospace;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:8px;padding:12px;color:#111827;white-space:pre-wrap;"
-                             th:text="${original}">
-                            일부 발췌…
-                        </div>
-                    </td>
-                </tr>
+            <!-- 제목 -->
+            <strong th:text="${c != null && c.title != null && !#strings.isEmpty(c.title)
+                               ? c.title : '제목 준비중'}"
+                    th:classappend="${c == null || #strings.isEmpty(c?.title)} ? ' placeholder' : ''">
+                카드 제목
+            </strong>
 
-                <!-- 5개 소스 리스트 -->
-                <tr th:if="${sources}">
-                    <td style="padding:0 24px 24px;">
-                        <div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:700;margin-bottom:8px;color:#111827;">오늘의 소스 5</div>
-                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
-                            <tr th:each="src,iter : ${sources}">
-                                <td style="padding:8px 0;border-bottom:1px solid #eef2f7;">
-                                    <a th:href="${src.link}" th:text="|${iter.index + 1}. ${src.title}|"
-                                       style="font-family:Arial,Helvetica,sans-serif;text-decoration:none;color:#2563eb;"></a>
-                                    <div style="font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#6b7280;" th:text="${src.category}">AI</div>
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
+            <!-- bullets 우선 -->
+            <ul th:if="${c != null && c.bullets != null && !#lists.isEmpty(c.bullets)}">
+                <li th:each="b : ${c.bullets}" th:text="${b}">불릿</li>
+            </ul>
 
-                <!-- CTA -->
-                <tr>
-                    <td style="padding:0 24px 28px;">
-                        <a th:href="${ctaUrl}" style="display:inline-block;background:#111827;color:#fff;text-decoration:none;padding:10px 16px;border-radius:8px;font-family:Arial,Helvetica,sans-serif;font-size:14px;">전체 보기</a>
-                    </td>
-                </tr>
+            <!-- bullets 없으면 desc -->
+            <p th:if="${!(c != null && c.bullets != null && !#lists.isEmpty(c.bullets))}"
+               th:text="${c != null && c.desc != null && !#strings.isEmpty(c.desc) ? c.desc : '요약 준비중'}"
+               th:classappend="${c == null || #strings.isEmpty(c?.desc)} ? ' placeholder' : ''">
+                간단 요약
+            </p>
 
-                <!-- 푸터 -->
-                <tr>
-                    <td style="background:#111827;color:#9ca3af;padding:16px 24px;font-family:Arial,Helvetica,sans-serif;font-size:12px;">
-                        © MailTrend · 자동 발송 메일입니다.
-                    </td>
-                </tr>
-            </table>
-        </td>
-    </tr>
-</table>
+            <!-- 링크: 있으면 a, 없으면 비활성 span -->
+            <a class="view"
+               th:if="${c != null && c.link != null && !#strings.isEmpty(c.link)}"
+               th:href="${c.link}" target="_blank">원문 보러 가기</a>
+            <span class="view-disabled"
+                  th:if="${c == null || c.link == null || #strings.isEmpty(c.link)}">링크 준비중</span>
+        </div>
+    </div>
+
+    <!-- 용어박스: 필요 시 words 전달하면 나옴 -->
+    <div class="mini-section-title" th:if="${words}">이 단어가 어렵나요?</div>
+    <ul class="word-list" th:if="${words}">
+        <li th:each="w : ${words}">
+            <b th:text="${w.term}">용어</b>: <span th:text="${w.desc}">설명</span>
+        </li>
+    </ul>
+
+    <!-- footer: 이미지 URL 있으면 그것을, 없으면 SVG 폴백 -->
+    <div class="footer-svg" th:if="${footerImageUrl}">
+        <img th:src="${footerImageUrl}" alt="footer" width="600" height="180"
+             style="display:block;border:0;width:100%;height:auto;"/>
+    </div>
+    <div class="footer-svg" th:if="${footerImageUrl == null}">
+        <!-- SVG 폴백... (생략) -->
+    </div>
+</div>
 </body>
 </html>
