@@ -17,7 +17,7 @@ public class DigestController {
     /** 예: POST /api/digest/AI?subject=[MailTrend]%20오늘의%20AI%20소식%205&ctaUrl=https://... */
     @PostMapping("/{category}")
     public ResponseEntity<?> enqueue(@PathVariable("category") String categoryName,
-                                     @RequestParam(defaultValue = "[MailTrend] 오늘의 AI 소식 5") String subject,
+                                     @RequestParam(defaultValue = "[MailTrend] 오늘의 소식 5") String subject,
                                      @RequestParam(required = false) String heroImageUrl,
                                      @RequestParam(required = false) String ctaUrl) {
         Category category = Category.valueOf(categoryName.toUpperCase());
