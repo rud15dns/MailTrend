@@ -53,7 +53,7 @@ public class MailOrchestrator {
             // e.g., log.info("snapshot uploaded: {}", snapshotUrl);
         });
 
-  
+
     }
 
     public Mono<String> sendDigest(String to, String subject,
